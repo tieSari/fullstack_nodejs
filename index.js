@@ -35,6 +35,17 @@ app.get('/api/persons/:id', (request, response) => {
   }
 })
 
+app.delete('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  const personsLeft = persons.splice(id,1)
+
+  if ( personsLeft.length > 0  ) {
+    response.status(204).end()
+  } else {
+    response.status(404).end()
+  }
+})
+
 app.get('/info', (req, res) => {
   res.send('<div>puhelinluettelossa '+persons.length +' henkilön tiedot</div>' +
   '<div>' + new Date() +'</div>')
