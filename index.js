@@ -54,6 +54,13 @@ app.post('/api/persons', (request, response) => {
    if (body.name === undefined) {
     return response.status(400).json({error: 'name missing'})
   }
+     if (body.number === undefined) {
+    return response.status(400).json({error: 'number missing'})
+     }
+
+    if(persons.map(person => person.name).includes(body.name)){
+        return response.status(400).json({error: 'name must be unique'})
+    }
 
 function generateId()
 {
