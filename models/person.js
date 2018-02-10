@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose')
 
-const url = 'mongodb://r:r@ds227858.mlab.com:27858/puhelinluettelo'
+const url = 'mongodb://rautasa:raut2828@ds227858.mlab.com:27858/puhelinluettelo'
 
 
 mongoose.connect(url)
