@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const Person = require('./models/person')
 const cors = require('cors')
 app.use(cors())
 const bodyParser = require('body-parser')
@@ -12,7 +13,6 @@ app.use(express.static('build'))
 morgan.token('body', function getBody (req) {
   return JSON.stringify(req.body)
 })
-
 
 let persons =  [
     {
@@ -32,68 +32,87 @@ let persons =  [
     }
   ]
 
+   const formatPerson = (person) => {    
+  const formattedPerson = { number: person.number, name: person.name, id: person._id }
+  
+    return formattedPerson
+      }
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  //res.json(persons)
+  Person
+  .find({})
+  .then(persons => {
+    persons.forEach(person => {
+      console.log(person)
+    })
+    res.json(persons.map(formatPerson))
+    mongoose.connection.close()
+  })
 })
 
-app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
-
-  if ( person ) {
-    response.json(person)
-  } else {
-    response.status(404).end()
-  }
+app.get('/api/persons/:id', (req, res) => {
+  const id = req.params.id
+  Person
+  .findById(id)
+  .then(person => {
+      console.log(person)
+    res.json(formatPerson(person))
+    mongoose.connection.close()
+  })
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const personsLeft = persons.splice(id,1)
-
-  if ( personsLeft.length > 0  ) {
-    response.status(204).end()
-  } else {
-    response.status(404).end()
-  }
+app.delete('/api/persons/:id', (req, res) => {
+  const id = req.params.id
+  Person
+  .findById(id)
+  .then(person => {
+  Person
+  .deleteOne(person)
+  .then(deletedInfo => {
+      console.log(deletedInfo)
+    res.json(deletedInfo)
+    mongoose.connection.close()
+  })
+})
 })
 
-app.post('/api/persons', (request, response) => {
-  const body = request.body
+app.post('/api/persons', (req, res) => {
+  const body = req.body
   console.log(body)
    if (body.name === undefined) {
-    return response.status(400).json({error: 'name missing'})
+    return res.status(400).json({error: 'name missing'})
   }
-     if (body.number === undefined) {
-    return response.status(400).json({error: 'number missing'})
-     }
+      if (body.number === undefined) {
+     return res.status(400).json({error: 'number missing'})
+      }
 
-    if(persons.map(person => person.name).includes(body.name)){
-        return response.status(400).json({error: 'name must be unique'})
-    }
+    // if(persons.map(person => person.name).includes(body.name)){
+    //     return response.status(400).json({error: 'name must be unique'})
+    // }
 
-function generateId()
-{
-    return Math.floor((Math.random() * 10000))
-}
-
- const person = {
-    name: body.name,
-    number: body.number,
-    id: generateId()
-  }
-persons = persons.concat(person)
-
-  response.json(person)
+    const person = new Person({
+      name: body.name,
+      number: body.number
+    })
   
-})
+    person
+      .save()
+      .then(savedPerson => {
+        res.json(formatPerson(savedPerson))
+      })
+  })
 
 
 
 app.get('/info', (req, res) => {
-  res.send('<div>puhelinluettelossa '+persons.length +' henkilön tiedot</div>' +
-  '<div>' + new Date() +'</div>')
+  Person
+  .find({})
+  .then(persons => {
+    res.send('<div>puhelinluettelossa '+persons.length +' henkilön tiedot</div>' +
+    '<div>' + new Date() +'</div>')
+    mongoose.connection.close()
+  })
 })
 
 const PORT = process.env.PORT || 3003
