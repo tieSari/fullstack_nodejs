@@ -12,7 +12,7 @@ var Schema = mongoose.Schema
 
 
 const personSchema = new Schema({
-    name: String,
+    name:   String,
     number: String
 })
 
@@ -20,6 +20,11 @@ const personSchema = new Schema({
  {
      const formattedPerson = { number: person.number, name: person.name, id: person._id }
      return formattedPerson
+ }
+
+ personSchema.query.byName = function(name)
+ {
+     return this.find({name: new RegExp(name, 'i')})
  }
 
 const Person = mongoose.model('Person', personSchema);

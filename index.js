@@ -11,63 +11,45 @@ app.use(express.static('build'))
 //const mongoose = require('mongoose')
 
 
-morgan.token('body', function getBody (req) {
+morgan.token('body', function getBody(req) {
   return JSON.stringify(req.body)
 })
-
-// let persons =  [
-//     {
-//       "name": "Martti Tienari",
-//       "number": "040-123456",
-//       "id": 2
-//     },
-//     {
-//       "name": "Arto Järvinen",
-//       "number": "040-123456",
-//       "id": 3
-//     },
-//     {
-//       "name": "Lea Kutvonen",
-//       "number": "040-123456",
-//       "id": 4
-//     }
-//   ]
 
 
 app.get('/api/persons', (req, res) => {
   Person
-  .find({})
-  .then(persons => {
-    persons.forEach(person => {
-      console.log(person)
+    .find({})
+    .then(persons => {
+      persons.forEach(person => {
+        console.log(person)
+      })
+      res.json(persons.map(Person.format))
+      //mongoose.connection.close()
     })
-    res.json(persons.map(Person.format))
-    //mongoose.connection.close()
-  })
-   .catch(error => {
-     console.log(error)
-     res.status(500).send({ error: 'persons get did not succeed' })
-   })
+    .catch(error => {
+      console.log(error)
+      res.status(500).send({ error: 'persons get did not succeed' })
+    })
 })
 
 app.get('/api/persons/:id', (req, res) => {
   const id = req.params.id
   Person
-  .findById(id)
-  .then(person => {
-    if(person){
-      console.log(person)
-    res.json(Person.format(person))
-    }
-    else{
-      res.status(404).end()
-    }
-    //mongoose.connection.close()
-  })
-  .catch(error => {
-    console.log(error)
-    res.status(400).send({ error: 'malformatted id' })
-  })
+    .findById(id)
+    .then(person => {
+      if (person) {
+        console.log(person)
+        res.json(Person.format(person))
+      }
+      else {
+        res.status(404).end()
+      }
+      //mongoose.connection.close()
+    })
+    .catch(error => {
+      console.log(error)
+      res.status(400).send({ error: 'malformatted id' })
+    })
 })
 
 app.put('/api/persons/:id', (req, res) => {
@@ -79,16 +61,16 @@ app.put('/api/persons/:id', (req, res) => {
   }
 
   Person
-  .findByIdAndUpdate(id, person, {new: true})
+    .findByIdAndUpdate(id, person, { new: true })
     .then(savedPerson => {
-        console.log(person)
-        res.json(Person.format(savedPerson))
-       // mongoose.connection.close()
-      })
-      .catch(error => {
-        console.log(error)
-        res.status(400).send({ error: 'malformatted id' })
-      })
+      console.log(person)
+      res.json(Person.format(savedPerson))
+      // mongoose.connection.close()
+    })
+    .catch(error => {
+      console.log(error)
+      res.status(400).send({ error: 'malformatted id' })
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -105,43 +87,47 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons', (req, res) => {
   const body = req.body
   console.log(body)
-   if (body.name === undefined) {
-    return res.status(400).json({error: 'name missing'})
+  if (body.name === undefined) {
+    return res.status(400).json({ error: 'name missing' })
   }
-      if (body.number === undefined) {
-     return res.status(400).json({error: 'number missing'})
-      }
+  if (body.number === undefined) {
+    return res.status(400).json({ error: 'number missing' })
+  }
+  Person.find().byName(body.name).exec(function (err, persons) {
+    if (persons.length > 0) {
+      console.log(persons)
+      return res.status(400).json({ error: 'name must be unique' })
+    }
+    else {
 
-    // if(persons.map(person => person.name).includes(body.name)){
-    //     return response.status(400).json({error: 'name must be unique'})
-    // }
+      const person = new Person({
+        name: body.name,
+        number: body.number
+      })
 
-    const person = new Person({
-      name: body.name,
-      number: body.number
-    })
-  
-    person
-      .save()
-      .then(savedPerson => {
-        res.json(Person.format(savedPerson))
-      })
-      .catch(error => {
-        console.log(error)
-        res.status(500).send({ error: 'person save did not succeed' })
-      })
+      person
+        .save()
+        .then(savedPerson => {
+          res.json(Person.format(savedPerson))
+        })
+        .catch(error => {
+          console.log(error)
+          res.status(500).send({ error: 'person save did not succeed' })
+        })
+    }
   })
+})
 
 
 
 app.get('/info', (req, res) => {
   Person
-  .find({})
-  .then(persons => {
-    res.send('<div>puhelinluettelossa '+persons.length +' henkilön tiedot</div>' +
-    '<div>' + new Date() +'</div>')
-    //mongoose.connection.close()
-  })
+    .find({})
+    .then(persons => {
+      res.send('<div>puhelinluettelossa ' + persons.length + ' henkilön tiedot</div>' +
+        '<div>' + new Date() + '</div>')
+      //mongoose.connection.close()
+    })
 })
 
 const PORT = process.env.PORT || 3003
