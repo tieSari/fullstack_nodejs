@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose')
 
-const url = 'mongodb://r....:r...@ds227858.mlab.com:27858/puhelinluettelo'
+const url = 'mongodb://r:r@ds227858.mlab.com:27858/puhelinluettelo'
 
 
 mongoose.connect(url)
@@ -24,12 +24,6 @@ const personSchema = new Schema({
 
 const Person = mongoose.model('Person', personSchema);
 
-
-// const formatPerson = (person) => {    
-//     const formattedPerson = { number: person.number, name: person.name, id: person._id }
-    
-//       return formattedPerson
-//         }
 
 
  

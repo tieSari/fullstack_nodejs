@@ -32,14 +32,8 @@ morgan.token('body', function getBody (req) {
 //     }
 //   ]
 
-  //  const formatPerson = (person) => {    
-  // const formattedPerson = { number: person.number, name: person.name, id: person._id }
-  
-  //   return formattedPerson
-  //     }
 
 app.get('/api/persons', (req, res) => {
-  //res.json(persons)
   Person
   .find({})
   .then(persons => {
@@ -49,6 +43,10 @@ app.get('/api/persons', (req, res) => {
     res.json(persons.map(Person.format))
     mongoose.connection.close()
   })
+   .catch(error => {
+     console.log(error)
+     res.status(500).send({ error: 'persons get did not succeed' })
+   })
 })
 
 app.get('/api/persons/:id', (req, res) => {
@@ -56,25 +54,30 @@ app.get('/api/persons/:id', (req, res) => {
   Person
   .findById(id)
   .then(person => {
+    if(person){
       console.log(person)
     res.json(Person.format(person))
+    }
+    else{
+      res.status(404).end()
+    }
     mongoose.connection.close()
+  })
+  .catch(error => {
+    console.log(error)
+    res.status(400).send({ error: 'malformatted id' })
   })
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = req.params.id
+app.delete('/api/persons/:id', (request, response) => {
   Person
-  .findById(id)
-  .then(person => {
-  Person
-  .deleteOne(person)
-  .then(deletedInfo => {
-      console.log(deletedInfo)
-    res.json(deletedInfo)
-    mongoose.connection.close()
-  })
-})
+    .findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => {
+      response.status(400).send({ error: 'malformatted id' })
+    })
 })
 
 app.post('/api/persons', (req, res) => {
@@ -100,6 +103,10 @@ app.post('/api/persons', (req, res) => {
       .save()
       .then(savedPerson => {
         res.json(Person.format(savedPerson))
+      })
+      .catch(error => {
+        console.log(error)
+        res.status(500).send({ error: 'person save did not succeed' })
       })
   })
 
