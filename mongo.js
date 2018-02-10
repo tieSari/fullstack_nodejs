@@ -6,10 +6,27 @@ const url = 'mongodb://r....a:r...8@ds227858.mlab.com:27858/puhelinluettelo'
 mongoose.connect(url)
 mongoose.Promise = global.Promise
 
-const Person = mongoose.model('Person', {
-  name: String,
-  number: String
+// const Person = mongoose.model('Person', {
+//   name: String,
+//   number: String
+// })
+
+var Schema = mongoose.Schema
+
+
+const personSchema = new Schema({
+    name: String,
+    number: String
 })
+
+ personSchema.statics.format = function(person)
+ {
+     const formattedPerson = { number: person.number, name: person.name, id: person._id }
+     return formattedPerson
+ }
+
+const Person = mongoose.model('Person', personSchema);
+console.log(Person.format({name:"ville",number: "999999"}))
 
 // if(process.argv[2] == undefined)
 // {

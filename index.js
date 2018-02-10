@@ -14,29 +14,29 @@ morgan.token('body', function getBody (req) {
   return JSON.stringify(req.body)
 })
 
-let persons =  [
-    {
-      "name": "Martti Tienari",
-      "number": "040-123456",
-      "id": 2
-    },
-    {
-      "name": "Arto Järvinen",
-      "number": "040-123456",
-      "id": 3
-    },
-    {
-      "name": "Lea Kutvonen",
-      "number": "040-123456",
-      "id": 4
-    }
-  ]
+// let persons =  [
+//     {
+//       "name": "Martti Tienari",
+//       "number": "040-123456",
+//       "id": 2
+//     },
+//     {
+//       "name": "Arto Järvinen",
+//       "number": "040-123456",
+//       "id": 3
+//     },
+//     {
+//       "name": "Lea Kutvonen",
+//       "number": "040-123456",
+//       "id": 4
+//     }
+//   ]
 
-   const formatPerson = (person) => {    
-  const formattedPerson = { number: person.number, name: person.name, id: person._id }
+  //  const formatPerson = (person) => {    
+  // const formattedPerson = { number: person.number, name: person.name, id: person._id }
   
-    return formattedPerson
-      }
+  //   return formattedPerson
+  //     }
 
 app.get('/api/persons', (req, res) => {
   //res.json(persons)
@@ -46,7 +46,7 @@ app.get('/api/persons', (req, res) => {
     persons.forEach(person => {
       console.log(person)
     })
-    res.json(persons.map(formatPerson))
+    res.json(persons.map(Person.format))
     mongoose.connection.close()
   })
 })
@@ -57,7 +57,7 @@ app.get('/api/persons/:id', (req, res) => {
   .findById(id)
   .then(person => {
       console.log(person)
-    res.json(formatPerson(person))
+    res.json(Person.format(person))
     mongoose.connection.close()
   })
 })
@@ -99,7 +99,7 @@ app.post('/api/persons', (req, res) => {
     person
       .save()
       .then(savedPerson => {
-        res.json(formatPerson(savedPerson))
+        res.json(Person.format(savedPerson))
       })
   })
 
