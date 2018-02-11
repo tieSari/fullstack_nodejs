@@ -1,8 +1,13 @@
 //import { Schema } from 'mongoose';
 
 const mongoose = require('mongoose')
-const url = process.env.MONGODB_URI
+console.log(process.env.NODE_ENV)
 
+if ( process.env.NODE_ENV === 'undefined' || process.env.NODE_ENV !== 'production' ) {
+    require('dotenv').config()
+  }
+const url = process.env.MONGODB_URI
+//console.log(url)
 
 mongoose.connect(url)
 mongoose.Promise = global.Promise
