@@ -1,8 +1,7 @@
 //import { Schema } from 'mongoose';
 
 const mongoose = require('mongoose')
-
-const url = 'mongodb://rautasa:raut2828@ds227858.mlab.com:27858/puhelinluettelo'
+const url = process.env.MONGODB_URI
 
 
 mongoose.connect(url)
